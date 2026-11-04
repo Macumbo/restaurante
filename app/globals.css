@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: var(--brand, #b4532a);
+  --color-accent: var(--accent, #2f6f4f);
+}
+
+:root {
+  --brand: #b4532a;
+  --accent: #2f6f4f;
+}
+
+body {
+  background: #faf8f5;
+  color: #1f1d1a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white bg-brand active:opacity-80 disabled:opacity-40;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 px-4 py-3 font-semibold text-stone-800 bg-white active:bg-stone-100 disabled:opacity-40;
+}
+.card {
+  @apply rounded-2xl bg-white p-4 shadow-sm border border-stone-200;
+}
+.input {
+  @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-3 text-base outline-none focus:border-brand;
+}
+.badge {
+  @apply inline-block rounded-full px-2 py-0.5 text-xs font-semibold;
+}
