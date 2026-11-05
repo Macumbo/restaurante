@@ -50,6 +50,11 @@ type DraftDish = {
   descEn: string;
   ingPt: string;
   ingEn: string;
+  allPt: string;
+  allEn: string;
+  photo: string;
+  prep: number | "";
+  special: boolean;
   price: number;
   available_today: boolean;
   modifiers: DraftModifier[];
@@ -63,6 +68,11 @@ const emptyDish = (categoryId: string | null): DraftDish => ({
   descEn: "",
   ingPt: "",
   ingEn: "",
+  allPt: "",
+  allEn: "",
+  photo: "",
+  prep: "",
+  special: false,
   price: 0,
   available_today: true,
   modifiers: [],
@@ -108,6 +118,11 @@ function Dishes({ restaurant }: { restaurant: Restaurant }) {
       descEn: d.description.en ?? "",
       ingPt: d.ingredients.pt ?? "",
       ingEn: d.ingredients.en ?? "",
+      allPt: d.allergens?.pt ?? "",
+      allEn: d.allergens?.en ?? "",
+      photo: d.photo_url ?? "",
+      prep: d.prep_minutes ?? "",
+      special: d.is_special,
       price: Number(d.price),
       available_today: d.available_today,
       modifiers: modifiers
@@ -138,6 +153,10 @@ function Dishes({ restaurant }: { restaurant: Restaurant }) {
       name: i18n(d.pt, d.en),
       description: i18n(d.descPt, d.descEn),
       ingredients: i18n(d.ingPt, d.ingEn),
+      allergens: i18n(d.allPt, d.allEn),
+      photo_url: d.photo.trim() || null,
+      prep_minutes: d.prep === "" ? null : d.prep,
+      is_special: d.special,
       price: d.price,
       available_today: d.available_today,
     };
@@ -213,8 +232,11 @@ function Dishes({ restaurant }: { restaurant: Restaurant }) {
               return (
                 <div key={d.id} className="card flex items-center gap-3">
                   <button className="min-w-0 flex-1 text-left" onClick={() => edit(d)}>
-                    <div className="font-semibold">{tx(d.name)}</div>
-                    <div className="text-sm text-stone-600">
+                    <div className="font-semibold">
+                      {d.is_special ? "🔥 " : ""}
+                      {tx(d.name)}
+                    </div>
+                    <div className="text-sm text-slate-600">
                       {formatMoney(d.price, restaurant.currency, lang)}
                       {mods.length ? ` · ${mods.length} ${t("manage.modifiers").toLowerCase()}` : ""}
                     </div>
@@ -274,7 +296,11 @@ function DishForm({
       draft.modifiers.map((m, j) => (j === i ? { ...m, ...patch } : m)),
     );
 
-  const field = (label: string, key: "pt" | "en" | "descPt" | "descEn" | "ingPt" | "ingEn", multiline = false) => (
+  const field = (
+    label: string,
+    key: "pt" | "en" | "descPt" | "descEn" | "ingPt" | "ingEn" | "allPt" | "allEn" | "photo",
+    multiline = false,
+  ) => (
     <label className="block space-y-1">
       <span className="text-sm font-semibold">{label}</span>
       {multiline ? (
@@ -322,6 +348,30 @@ function DishForm({
       {field(t("manage.descEn"), "descEn", true)}
       {field(t("manage.ingPt"), "ingPt", true)}
       {field(t("manage.ingEn"), "ingEn", true)}
+      {field(t("manage.allergensPt"), "allPt")}
+      {field(t("manage.allergensEn"), "allEn")}
+      {field(t("manage.photoUrl"), "photo")}
+      <label className="block space-y-1">
+        <span className="text-sm font-semibold">{t("manage.prepMinutes")}</span>
+        <input
+          className="input"
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={240}
+          value={draft.prep}
+          onChange={(e) => set("prep", e.target.value === "" ? "" : Number(e.target.value))}
+        />
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          className="h-5 w-5 accent-[var(--brand)]"
+          checked={draft.special}
+          onChange={(e) => set("special", e.target.checked)}
+        />
+        {t("manage.special")}
+      </label>
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -335,7 +385,7 @@ function DishForm({
       <div className="space-y-2">
         <h3 className="font-semibold">{t("manage.modifiers")}</h3>
         {draft.modifiers.map((m, i) => (
-          <div key={m.id ?? i} className="space-y-2 rounded-xl border border-stone-200 p-3">
+          <div key={m.id ?? i} className="space-y-2 rounded-xl border border-slate-200 p-3">
             <div className="flex gap-2">
               <select
                 className="input !w-auto"
@@ -459,7 +509,7 @@ function Tables({ restaurant }: { restaurant: Restaurant }) {
         <div className="text-lg">{restaurant.name}</div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={qr.image} alt={qr.url} className="mx-auto w-72 max-w-full" />
-        <div className="break-all text-xs text-stone-500">{qr.url}</div>
+        <div className="break-all text-xs text-slate-500">{qr.url}</div>
         <div className="grid grid-cols-2 gap-2 print:hidden">
           <button className="btn-ghost" onClick={() => setQr(null)}>
             ←
@@ -498,9 +548,9 @@ function Tables({ restaurant }: { restaurant: Restaurant }) {
       </div>
       <div className="grid grid-cols-2 gap-2">
         {tables.map((tb) => (
-          <button key={tb.id} className="card text-left active:bg-stone-50" onClick={() => showQr(tb)}>
+          <button key={tb.id} className="card text-left active:bg-slate-50" onClick={() => showQr(tb)}>
             <div className="text-lg font-bold">{tb.label}</div>
-            <div className="text-sm text-stone-600">
+            <div className="text-sm text-slate-600">
               {tb.seats ? `${tb.seats} ${t("manage.seats").toLowerCase()} · ` : ""}
               {t("manage.showQr")}
             </div>
@@ -522,13 +572,21 @@ function Brand({ restaurant }: { restaurant: Restaurant }) {
     primary_color: restaurant.primary_color,
     accent_color: restaurant.accent_color,
     logo_url: restaurant.logo_url ?? "",
+    taglinePt: restaurant.tagline?.pt ?? "",
+    taglineEn: restaurant.tagline?.en ?? "",
   });
   const [msg, setMsg] = useState<string | null>(null);
 
   async function save() {
     const { error } = await supabase()
       .from("restaurants")
-      .update({ ...form, logo_url: form.logo_url || null })
+      .update({
+        name: form.name,
+        primary_color: form.primary_color,
+        accent_color: form.accent_color,
+        logo_url: form.logo_url || null,
+        tagline: i18n(form.taglinePt, form.taglineEn),
+      })
       .eq("id", restaurant.id);
     setMsg(error ? error.message : t("manage.saved"));
     if (!error) window.location.reload();
@@ -563,6 +621,14 @@ function Brand({ restaurant }: { restaurant: Restaurant }) {
       <label className="block space-y-1">
         <span className="text-sm font-semibold">{t("manage.logoUrl")}</span>
         <input className="input" value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+      </label>
+      <label className="block space-y-1">
+        <span className="text-sm font-semibold">{t("manage.taglinePt")}</span>
+        <input className="input" value={form.taglinePt} onChange={(e) => setForm({ ...form, taglinePt: e.target.value })} />
+      </label>
+      <label className="block space-y-1">
+        <span className="text-sm font-semibold">{t("manage.taglineEn")}</span>
+        <input className="input" value={form.taglineEn} onChange={(e) => setForm({ ...form, taglineEn: e.target.value })} />
       </label>
       {msg ? <p className="text-sm">{msg}</p> : null}
       <button className="btn w-full" onClick={save}>

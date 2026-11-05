@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import type { DiningTable, Order, Participant, TableSession } from "@/lib/types";
+import type { DiningTable, Order, Participant, TableSession, WaiterCall } from "@/lib/types";
 
 /** Sessões abertas, pedidos ativos, mesas e participantes de um restaurante, em tempo real. */
 export function useLiveRestaurant(restaurantId: string) {
@@ -10,10 +10,11 @@ export function useLiveRestaurant(restaurantId: string) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [tables, setTables] = useState<DiningTable[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [calls, setCalls] = useState<WaiterCall[]>([]);
 
   const load = useCallback(async () => {
     const sb = supabase();
-    const [s, o, t] = await Promise.all([
+    const [s, o, t, c] = await Promise.all([
       sb
         .from("table_sessions")
         .select("*")
@@ -27,6 +28,12 @@ export function useLiveRestaurant(restaurantId: string) {
         .in("status", ["pending_approval", "approved", "preparing", "ready"])
         .order("created_at"),
       sb.from("dining_tables").select("*").eq("restaurant_id", restaurantId),
+      sb
+        .from("waiter_calls")
+        .select("*")
+        .eq("restaurant_id", restaurantId)
+        .is("resolved_at", null)
+        .order("created_at"),
     ]);
     const sessionIds = (s.data ?? []).map((x) => x.id);
     const p = sessionIds.length
@@ -36,6 +43,7 @@ export function useLiveRestaurant(restaurantId: string) {
     setOrders((o.data ?? []) as Order[]);
     setTables((t.data ?? []) as DiningTable[]);
     setParticipants((p.data ?? []) as Participant[]);
+    setCalls((c.data ?? []) as WaiterCall[]);
   }, [restaurantId]);
 
   useEffect(() => {
@@ -53,6 +61,11 @@ export function useLiveRestaurant(restaurantId: string) {
         { event: "*", schema: "public", table: "table_sessions", filter: `restaurant_id=eq.${restaurantId}` },
         () => void load(),
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "waiter_calls", filter: `restaurant_id=eq.${restaurantId}` },
+        () => void load(),
+      )
       .subscribe();
     // Recarrega periodicamente, caso a ligação em tempo real caia (rede móvel)
     const poll = setInterval(() => void load(), 30000);
@@ -68,7 +81,7 @@ export function useLiveRestaurant(restaurantId: string) {
   const personName = (participantId: string) =>
     participants.find((p) => p.id === participantId)?.display_name ?? "";
 
-  return { sessions, orders, tables, participants, reload: load, tableLabel, sessionOf, personName };
+  return { sessions, orders, tables, participants, calls, reload: load, tableLabel, sessionOf, personName };
 }
 
 /** Aviso sonoro curto quando chega algo novo (garçom e cozinha). */

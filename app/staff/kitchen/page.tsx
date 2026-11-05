@@ -49,7 +49,7 @@ function Kitchen({ restaurant }: { restaurant: Restaurant }) {
         <h2 className="hidden text-lg font-bold md:block">
           {c.title} ({list.length})
         </h2>
-        {list.length === 0 ? <p className="text-stone-500">{t("kitchen.empty")}</p> : null}
+        {list.length === 0 ? <p className="text-slate-500">{t("kitchen.empty")}</p> : null}
         {list.map((o) => (
           <div key={o.id} className="card space-y-3">
             <div className="flex items-baseline justify-between">

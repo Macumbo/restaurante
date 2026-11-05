@@ -9,6 +9,7 @@ export type Restaurant = {
   primary_color: string;
   accent_color: string;
   currency: string;
+  tagline: I18nText;
 };
 
 export type Category = {
@@ -26,6 +27,9 @@ export type Dish = {
   name: I18nText;
   description: I18nText;
   ingredients: I18nText;
+  allergens: I18nText;
+  prep_minutes: number | null;
+  is_special: boolean;
   price: number;
   photo_url: string | null;
   available_today: boolean;
@@ -61,6 +65,7 @@ export type TableSession = {
   table_id: string;
   status: SessionStatus;
   opened_at: string;
+  confirmed_by: string | null;
 };
 
 export type Participant = {
@@ -103,3 +108,14 @@ export type Order = {
 };
 
 export type Role = "owner" | "manager" | "waiter" | "kitchen";
+
+export type CallReason = "assist" | "bill" | "water" | "cutlery";
+
+export type WaiterCall = {
+  id: string;
+  session_id: string;
+  participant_id: string;
+  reason: CallReason;
+  created_at: string;
+  resolved_at: string | null;
+};

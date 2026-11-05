@@ -2,7 +2,7 @@
 -- A equipa é ligada depois de criar as contas (ver README, "Criar a equipa").
 
 insert into public.restaurants (id, slug, name, primary_color, accent_color)
-values ('00000000-0000-0000-0000-000000000001', 'demo', 'Restaurante Demo', '#B4532A', '#2F6F4F')
+values ('00000000-0000-0000-0000-000000000001', 'demo', 'Restaurante Demo', '#EA580C', '#0F172A')
 on conflict (id) do nothing;
 
 insert into public.categories (id, restaurant_id, name, position) values
@@ -50,3 +50,15 @@ insert into public.dining_tables (restaurant_id, label, seats, qr_token) values
   ('00000000-0000-0000-0000-000000000001', 'Mesa 2', 4, 'demo-mesa-2'),
   ('00000000-0000-0000-0000-000000000001', 'Varanda', 8, 'demo-varanda')
 on conflict do nothing;
+
+-- Destaque do dia, alergénios, tempo de preparação e fotos (exemplo)
+update public.restaurants
+   set tagline = '{"pt": "Sabores na brasa e tradição angolana", "en": "Grilled flavours and Angolan tradition"}'
+ where id = '00000000-0000-0000-0000-000000000001';
+
+update public.dishes set is_special = true, prep_minutes = 25,
+  allergens = '{"pt": "Glúten (batata frita)", "en": "Gluten (fries)"}',
+  photo_url = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80'
+ where id = '00000000-0000-0000-0000-0000000000d1';
+update public.dishes set prep_minutes = 30 where id = '00000000-0000-0000-0000-0000000000d2';
+update public.dishes set prep_minutes = 2 where id in ('00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-0000000000d4');

@@ -11,10 +11,10 @@ export function LangSwitch() {
       aria-label={t("lang.label")}
       value={lang}
       onChange={(e) => setLang(e.target.value as Lang)}
-      className="rounded-lg border border-white/40 bg-transparent px-2 py-1 text-sm"
+      className="rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-sm font-semibold text-slate-700"
     >
       {Object.entries(LANGUAGES).map(([code, { label }]) => (
-        <option key={code} value={code} className="text-black">
+        <option key={code} value={code}>
           {label}
         </option>
       ))}
@@ -37,17 +37,22 @@ export function BrandShell({
   const style = restaurant
     ? ({ "--brand": restaurant.primary_color, "--accent": restaurant.accent_color } as React.CSSProperties)
     : undefined;
+  const initial = restaurant?.name?.trim().charAt(0).toUpperCase() ?? "";
   return (
     <div style={style} className="min-h-dvh">
-      <header className="sticky top-0 z-20 bg-brand text-white">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-3xl items-center gap-3 px-4">
           {restaurant?.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={restaurant.logo_url} alt="" className="h-9 w-9 rounded-full bg-white object-cover" />
+            <img src={restaurant.logo_url} alt="" className="h-10 w-10 rounded-2xl object-cover" />
+          ) : restaurant ? (
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand/10 text-lg font-extrabold text-brand">
+              {initial}
+            </div>
           ) : null}
           <div className="min-w-0 flex-1">
-            <div className="truncate font-bold">{restaurant?.name ?? ""}</div>
-            {subtitle ? <div className="truncate text-sm opacity-90">{subtitle}</div> : null}
+            <div className="truncate font-extrabold text-slate-900">{restaurant?.name ?? ""}</div>
+            {subtitle ? <div className="truncate text-xs font-semibold text-slate-500">{subtitle}</div> : null}
           </div>
           {right}
           <LangSwitch />
@@ -63,7 +68,7 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
   approved: "bg-sky-100 text-sky-900",
   preparing: "bg-indigo-100 text-indigo-900",
   ready: "bg-emerald-100 text-emerald-900",
-  delivered: "bg-stone-200 text-stone-700",
+  delivered: "bg-slate-200 text-slate-700",
   rejected: "bg-red-100 text-red-900",
   cancelled: "bg-red-100 text-red-900",
 };
@@ -84,7 +89,7 @@ export function OrderItems({ order, large = false, currency }: { order: Order; l
             <span className="font-semibold">
               {it.quantity}× {tx(it.dish_name)}
             </span>
-            {currency ? <span className="text-stone-600">{formatMoney(it.line_total, currency, lang)}</span> : null}
+            {currency ? <span className="text-slate-600">{formatMoney(it.line_total, currency, lang)}</span> : null}
           </div>
           {it.modifiers.length > 0 ? (
             <div className="mt-1 flex flex-wrap gap-1">
@@ -109,9 +114,9 @@ export function OrderItems({ order, large = false, currency }: { order: Order; l
 
 export function TimeAgo({ iso }: { iso: string }) {
   const { lang } = useI18n();
-  return <span className="text-sm text-stone-500">{formatTime(iso, lang)}</span>;
+  return <span className="text-sm text-slate-500">{formatTime(iso, lang)}</span>;
 }
 
 export function Spinner() {
-  return <div className="mx-auto my-16 h-8 w-8 animate-spin rounded-full border-4 border-stone-300 border-t-brand" />;
+  return <div className="mx-auto my-16 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-brand" />;
 }
