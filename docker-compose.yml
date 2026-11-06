@@ -1,0 +1,13 @@
+# Só a aplicação. A base de dados (Supabase completo: Postgres, Auth, REST, Realtime)
+# corre com "npx supabase start", que também usa Docker. Ver README, "Correr com Docker".
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:?defina no ficheiro .env}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?defina no ficheiro .env}
+    container_name: restaurante-app
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

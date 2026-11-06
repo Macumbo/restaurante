@@ -25,16 +25,32 @@ Documento de arquitetura: <https://claude.ai/artifact/BXyLbKxhpKbVDen56ec3fy>
 
 ## Correr localmente
 
-Requisitos: Node 20+, Docker.
+Requisitos: Node 22+, Docker.
 
 ```bash
 npm install
-npx supabase start          # base de dados local, aplica migrações e seed.sql
+npx supabase@2 start        # base de dados local (Docker), aplica migrações e seed.sql
 cp .env.example .env.local  # preencher com o "API URL" e a "anon key" mostrados acima
 npm run dev
 ```
 
 Abra <http://localhost:3000/m/demo-mesa-1> para a mesa de demonstração.
+
+### Correr com Docker
+
+O `docker-compose.yml` corre só a aplicação. A base de dados tem de ser o Supabase completo
+(Postgres + Auth + REST + Realtime), que o `npx supabase@2 start` já põe a correr em Docker.
+Um Postgres simples não chega: a aplicação precisa da autenticação e da API do Supabase.
+
+```bash
+npx supabase@2 start                 # mostra o "API URL" e a "anon key" (ou: npx supabase@2 status)
+cp .env.example .env                 # preencher com esses dois valores
+docker compose up --build            # http://localhost:3000/m/demo-mesa-1
+```
+
+As variáveis `NEXT_PUBLIC_*` ficam gravadas no código do navegador durante o build, por isso
+entram como build args. Se as mudar, volte a correr `docker compose up --build`.
+Sem elas, o app mostra "O app ainda não está ligado à base de dados."
 
 ### Criar a equipa
 
@@ -52,7 +68,7 @@ from auth.users where email = 'dono@exemplo.ao';
 
 1. **Supabase:** criar um projeto (região mais próxima: Europa). Em *Authentication → Sign In / Providers*,
    ativar **Allow anonymous sign-ins** (os clientes pedem sem registo).
-   Aplicar as migrações: `npx supabase link --project-ref <ref>` e `npx supabase db push`.
+   Aplicar as migrações: `npx supabase@2 link --project-ref <ref>` e `npx supabase@2 db push`.
    Para dados de demonstração, correr `supabase/seed.sql` no SQL Editor.
 2. **Vercel:** importar o repositório e definir `NEXT_PUBLIC_SUPABASE_URL` e
    `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
