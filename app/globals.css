@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: var(--brand, #ea580c);
+  --color-accent: var(--accent, #0f172a);
+}
+
+:root {
+  --brand: #ea580c;
+  --accent: #0f172a;
+}
+
+body {
+  background: #f1f5f9;
+  color: #1e293b;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white bg-brand shadow-sm active:scale-[0.98] transition disabled:opacity-40;
+}
+.btn-dark {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white bg-slate-950 shadow-sm active:scale-[0.98] transition disabled:opacity-40;
+}
+.btn-success {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white bg-emerald-600 shadow-sm active:scale-[0.98] transition disabled:opacity-40;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 font-semibold text-slate-800 bg-white active:bg-slate-50 transition disabled:opacity-40;
+}
+.btn-soft {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-semibold text-slate-800 bg-slate-100 active:bg-slate-200 transition disabled:opacity-40;
+}
+.card {
+  @apply rounded-3xl bg-white p-4 shadow-sm border border-slate-200/80;
+}
+.input {
+  @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20;
+}
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold;
+}
+.chip {
+  @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700;
+}
+.chip-active {
+  @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white;
+}
+.section-title {
+  @apply text-lg font-extrabold tracking-tight text-slate-900;
+}
