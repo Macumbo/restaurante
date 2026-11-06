@@ -18,7 +18,7 @@ Documento de arquitetura: <https://claude.ai/artifact/BXyLbKxhpKbVDen56ec3fy>
 
 ## Tecnologia
 
-- Next.js 15 (React 19, TypeScript, Tailwind CSS 4)
+- Next.js 16 (React 19, TypeScript, Tailwind CSS 4)
 - Supabase: PostgreSQL com RLS por restaurante, autenticação, tempo real
 - As regras de negócio estão em funções SQL (`supabase/migrations`): preços calculados no
   servidor, aprovação do 1.º pedido, transições de estado por papel.
